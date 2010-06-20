@@ -1,0 +1,23 @@
+=== 0.0.1 2010-06-19
+
+* First version of Image DB written; we can break it up like so:
+  * CRUD operations
+    * store original
+    * update original and sized images
+    * delete original and sized images
+    * fetching/resolving
+      * fetch location of image with option to resolve
+        to a http alias (or alternative root)
+      * autogeneration of sized images
+  * Resolving
+    * resolve/absolute functions resolve names
+      but don't check existence
+  * Querying and listing
+    * DB#image details about original and its size images;
+      DB#images to search on originals; use grep.
+      DB#glob to use shell wildcards.
+  * Hierarchical
+    * Ability to store new hierarchical db's within the parent
+      * DB#[group_name]
+      * DB#groups to list groups
+

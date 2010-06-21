@@ -1,0 +1,4 @@
+[21-Jun-2010]
+* An interface to make ruby-db language agnostic
+* Use of bin/convert and bin/identify; we need to allow
+  for RMagick which would be more scalable.

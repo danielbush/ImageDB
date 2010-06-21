@@ -351,15 +351,19 @@ module ImageDb
     # Store an original image
     #
     # This is the only way new images can be stored in the
-    # db.  'name' should be a filepath to a real image.
+    # db.  'path' should be a filepath to a real image.
+    # You can specify an alternative image name to the 'path'
+    # using options[:name]
+    #   store '/path/to/image.jpg' , :name => 'image-2.jpg'
 
-    def store name,options=nil
-      nm = File.join(@originals,File.basename(name))
+    def store path,options=nil
+      name = options && options[:name] ? options[:name] : File.basename(path)
+      nm = File.join(@originals,name)
       if File.exists?(nm)
         raise 'Error #1 '+@@errors[1] if options.nil? || !options[:force]
       end
-      FileUtils.copy name , @originals
-      @hooks.create(:force => options.nil? ? nil : options[:force] ,
+      FileUtils.copy path , nm
+      @hooks.create(:force => (options.nil? ? nil : options[:force]) ,
                     :original => nm) if @hooks
       nm
     end

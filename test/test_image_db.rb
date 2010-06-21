@@ -86,6 +86,16 @@ class TestImageDb < Test::Unit::TestCase
     r = db.store(nm,:force => true)  # No errors this time.
   end
 
+  # Store an image with an alternate name...
+
+  def test_02c
+    db = ITestUtils.newdb
+    nm = File.join(@@test_data,'image-1.jpg')
+    r = db.store(nm,:name => 'image-1a.jpg')
+    #puts %x{file #{r}}
+    assert_equal 'image-1a.jpg',File.basename(r)
+  end
+
 
   #--------------------------------------------------------------
   # Fetching

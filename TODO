@@ -1,4 +1,11 @@
-[21-Jun-2010]
+[21-Jun-2010] [DB]
 * An interface to make ruby-db language agnostic
+  * distributed ruby
+  * REST
 * Use of bin/convert and bin/identify; we need to allow
   for RMagick which would be more scalable.
+* Review what we return and how we error.
+  * do we return path on deletes and updates? should it
+    be resolved or just the image name
+  * hooks and errors; if hook has error...  ; if db has error...
+

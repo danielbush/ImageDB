@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Mon Jun 21 09:41:19 +1000 2010</td>
+      <td>Wed Jun 23 02:10:27 +1000 2010</td>
     </tr>
     </table>
   </div>
@@ -136,6 +136,22 @@ originals; use grep. DB#glob to use shell wildcards.
 </ul>
 </li>
 </ul>
+<h3>0.0.2 2010-06-21</h3>
+<pre>
+  * Ability to store an image using a different name
+  * Ability to rename an image (including over an existing one)
+
+  * fetch always resolves to rel_root but can be sent params[:absolute]=&gt;true
+    to always fetch file location
+    * rel_root defaults to root if not specified so that
+      fetch will always resolve file location regardless
+    * absolute/resolve always return a location regardless of
+      existence of the image; fetch adds extra logic: return nil
+      if doesn't exist; autogenerate sized images etc
+  * autoresolve setting is gone as a result of the above behaviour
+  * fetch can be told to return another image if the image doesn't
+    exist using param :not_found =&gt; '/path/to/not-found-image.jpg' etc
+</pre>
 
     </div>
 

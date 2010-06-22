@@ -1,9 +1,11 @@
 AUTHORS
 History.txt
+LICENSE
 Manifest.txt
 PostInstall.txt
 README.rdoc
 Rakefile
+TODO
 image_db.gemspec
 lib/image_db.rb
 lib/image_db/db.rb

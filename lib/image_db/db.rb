@@ -119,13 +119,13 @@ module ImageDb
 # 
 # === STORING
 # 
-#   db.store(name)
-#     => "/path/to/name"
+#   db.store('/path/to/image.jpg')
+#     => "/db-root/path/to/image.jpg"  # Path will be in db.root.
 #     => error if exists
-#   db.store(name,:force => true)
-#     => "/path/to/name" # Overrides existing
-#   db['group1'].store(name)
-#     => "/path/to/groups/group1/name"
+#   db.store('/path/to/image.jpg',:force => true)
+#     => "/db-root/path/to/name" # Overrides existing
+#   db['group1'].store('/path/to/image.jpg')
+#     => "/db-root/path/to/groups/group1/image.jpg"
 # 
 # 
 # === FETCHING
@@ -139,20 +139,29 @@ module ImageDb
 #     db.fetch(name)
 #       => fetches original image
 #       => nil if not there
-#       => "#{db.root}/image"
+#       => "/db.root/path/to/image"
 #     
-#     db.fetch(name,:width => w)
-#     db.fetch(name,:height => h)
+#     db.fetch(name,:width => 60)
+#     db.fetch(name,:height => 60)
 #       => fetches sized image; autogenerates it if necessary
-#       => "#{db.root}/w/60/image"
+#       => "/db.root/path/to/w/60/image"
 # 
-#     db.fetch(name,:height => h,:exists => true)
+#     db.fetch(name,:height => 60,:exists => true)
 #       => Don't autogenerate if image doesn't exist
 # 
-#     db['group1'].fetch(name,:width => w)
+#     db['group1'].fetch(name,:width => 60)
 #       => Fetch image from group1
 #       => nil if image or group don't exist
 # 
+# === NOT FOUND IMAGES
+# 
+# * Set DB#use_not_found=true
+# * You can specify a not found image to use when fetching images
+#   that don't exist (instead of returning nil)
+# * You can also specify a not found image as a param option when
+#   fetching an image
+# * Your not-found image should be an existing image in the db and
+#   will be auto-resized as required (like other images)
 # 
 # === RESOLVING
 # 
@@ -162,18 +171,16 @@ module ImageDb
 #   * your alias or server root should point to the actual root of
 #     the db
 # * specify the resolving root as a second argument when creating db
-# * then set db.autoresolve=true
-# * if autoresolve is used but rel_root not set, db will return actual
-#   file location
 #
 #     root = '/var/www/site1/public/images/db'
 #     rel_root = '/images/db'
 #     db = ImageDb::DB.new(root,rel_root)
-#     db.autoresolve = true
 #     ...
 # 
 #     src = db.fetch(image_name)
 #        => '/images/db/.../image-1.jpg'
+#     src = db.fetch(image_name,:absolute => true)
+#        => '/var/www/.../image-1.jpg'
 # 
 # === UPDATING
 # 
@@ -273,16 +280,28 @@ module ImageDb
 
   class DB
 
-    attr_reader :root,:rel_root,:originals
-    attr_accessor :autoresolve
+    attr_reader :root,:rel_root,:originals,:parent_db
     attr_accessor :hooks
+    attr_writer :not_found_image
+    attr_accessor :use_not_found
 
-    def initialize root,rel_root=nil
+    # Return not_found_image in this db or nearest parent db.
+    #
+    # You can override this setting using params[:not_found] in fetch.
+
+    def not_found_image
+      return @not_found_image if @not_found_image
+      return self.parent_db.not_found_image if self.parent_db
+      return nil
+    end
+
+    def initialize root,rel_root=nil,parent_db=nil
       @root = root
       @rel_root = rel_root.nil? ? root : rel_root
-      @autoresolve = false
       @mutex = Mutex.new
       @hooks = nil
+      @parent_db = parent_db
+      @not_found_image = nil
 
       # Stores groups which are instances of DB
       @groups = Hash.new
@@ -314,7 +333,7 @@ module ImageDb
     def resolve nm,params=nil
       return nil if nm.nil?
       root = @root
-      root = @rel_root if @autoresolve
+      root = @rel_root unless params && params[:absolute]
       if params.nil?
         File.join(root,'originals',File.basename(nm))
       elsif params[:width]
@@ -326,7 +345,7 @@ module ImageDb
       end
     end
 
-    # Resolve names absolutely regardless of @autoresolve setting.
+    # Resolve names absolutely using root not rel_root.
     # A string location is always returned.
     #
     # * Useful for performing real filesystem operations
@@ -334,12 +353,9 @@ module ImageDb
 
     def absolute nm,params=nil
       n = nil
-      @mutex.synchronize do 
-        r = @autoresolve
-        @autoresolve = false
-        n = resolve nm,params
-        @autoresolve = r
-      end
+      params ||= {}
+      params[:absolute] = true
+      n = resolve nm,params
       return n
     end
 
@@ -368,6 +384,28 @@ module ImageDb
       nm
     end
 
+    # Rename an image in the db to a new name including all its sized
+    # versions.
+    #
+    # Use params[:force]=true to force writing over an image.
+
+    def rename old,new,params=nil
+      a = self.image(old)
+      return nil if a.nil?
+      b = self.image(new)
+      if !b.nil?
+        raise 'Error #3 ' + @@errors[3] if !params || !params[:force]
+        delete b[:original]
+      end
+      self.store absolute(a[:original]),:name => new
+      a[:widths].each do |w|
+        self.fetch new , :width => w
+      end
+      a[:heights].each do |w|
+        self.fetch new , :height => w
+      end
+      delete a[:original]
+    end
 
     # Fetch an image (original or sized)
     #
@@ -375,11 +413,34 @@ module ImageDb
     # does not exist in the db.  If you are fetching a sized
     # image of an existing original which doesn't exist, it
     # will be autogenerated from the original.
+    #
+    # == Params
+    # * width or height: specify desired width or height of image.
+    #                    Omitting this will return the original.
+    # * absolute: return the file path; do not resolve to rel_root
+    # * not_found: specify a not_found image; in general set this using
+    #              DB#not_found_image but override here if you want to
+    # * exists: do not autogenerate image; this is how to test for existence
+    # * skiphook: skip running creation hook
+    # * update: force image generation even if it exists; used by 'update'
 
     def fetch name,params=nil
 
-      o = absolute(name)
+      o = absolute(name) # Original
       n = nil
+
+      # Find not_found image...
+      nf = (params && params.has_key?(:not_found) ?
+                     params[:not_found] : self.not_found_image)
+
+      # Original doesn't exist, use nf...
+
+      if !File.exists?(o) && self.use_not_found
+        name = nf
+        o = absolute(name)
+      end
+
+      return nil if name.nil?
 
       # Fetch original...
 
@@ -388,24 +449,33 @@ module ImageDb
         return nil
       end
 
-      # Otherwise, we're looking for a sized image...
+      raise "fetch: Invalid options" if !params.has_key?(:width) &&
+        !params.has_key?(:height) &&
+        !params.has_key?(:absolute) &&
+        !params.has_key?(:not_found)
 
-      if params.has_key?(:width) || params.has_key?(:height)
-        n = absolute(name,params)
-      else
-        raise "fetch: Invalid options"
-      end
-
+      n = absolute(name,params) # Sized or original
       FileUtils.mkdir_p File.dirname(n)
 
       # Autogenerate/regenerate/do-nothing on sized image (n)
       # depending on settings...
 
       if File.exists?(n)
-        return resolve(name,params) unless params[:update]
+        unless params[:update]
+          return absolute(name,params) if params[:absolute]
+          return resolve(name,params)
+        end
       else
+        if params[:exists]==true
+          # Slightly ugly.  We have an original, but this size
+          # doesn't exist.  We revert back to the not found image.
+          if self.use_not_found
+            return absolute(nf,params) if params[:absolute]
+            return resolve(nf,params)
+          end
+          return nil
+        end
         autogenerated = true
-        return nil if params[:exists]==true
       end
 
       i = Image.new(o)
@@ -416,6 +486,7 @@ module ImageDb
                     :autogenerated => autogenerated,
                     :width => params[:width],
                     :height => params[:height]) if @hooks && !params[:skiphook]
+      return absolute(name,params) if params[:absolute]
       return resolve(name,params)
     end
 
@@ -565,19 +636,17 @@ module ImageDb
       end
     end
 
-    # Access a group to perform DB operations on that group
+    # Access a group to perform DB operations on that group.
 
     def [] name
       @groups ||= {}
       root = File.join(@root,'groups',name)
+      rel_root = @rel_root.nil? ? root : File.join(@rel_root,'groups',name)
       FileUtils.mkdir_p(root)
       return @groups[name] if @groups[name]
-      if @rel_root
-        rel_root = File.join(@rel_root,'groups',name)
-        return (@groups[name] = DB.new(root,rel_root))
-      else
-        return (@groups[name] = DB.new(root))
-      end
+      db = DB.new(root,rel_root,self)
+      db.use_not_found = self.use_not_found
+      return (@groups[name] = db)
     end
 
     @@errors = {
@@ -586,8 +655,8 @@ module ImageDb
       # the same name that depicts something totally different.
       # If this is so, set the force option and clear out all
       # copies of the older image.
-      2 => 'Params should be nil or contain either :width or :height but not both'
-
+      2 => 'Params should be nil or contain either :width or :height but not both' ,
+      3 => 'Image exists.  You are trying to replace it with another one.  Use the force option.' 
     }
 
   end

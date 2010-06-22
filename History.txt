@@ -21,3 +21,18 @@
       * DB#[group_name]
       * DB#groups to list groups
 
+=== 0.0.2 2010-06-21
+
+  * Ability to store an image using a different name
+  * Ability to rename an image (including over an existing one)
+
+  * fetch always resolves to rel_root but can be sent params[:absolute]=>true
+    to always fetch file location
+    * rel_root defaults to root if not specified so that
+      fetch will always resolve file location regardless
+    * absolute/resolve always return a location regardless of
+      existence of the image; fetch adds extra logic: return nil
+      if doesn't exist; autogenerate sized images etc
+  * autoresolve setting is gone as a result of the above behaviour
+  * fetch can be told to return another image if the image doesn't
+    exist using param :not_found => '/path/to/not-found-image.jpg' etc

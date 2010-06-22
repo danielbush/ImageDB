@@ -1,6 +1,6 @@
 = Image DB and Image File
 
-* See http://github.com/danielbush for source
+* http://github.com/danielbush
 * Licence is contained in this file.
 
 == DESCRIPTION:

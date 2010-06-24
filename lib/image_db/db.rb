@@ -333,7 +333,7 @@ module ImageDb
     def resolve nm,params=nil
       return nil if nm.nil?
       root = @root
-      root = @rel_root unless params && params[:absolute]
+      root = @rel_root unless (params && params[:absolute])
       if params.nil?
         File.join(root,'originals',File.basename(nm))
       elsif params[:width]
@@ -353,9 +353,9 @@ module ImageDb
 
     def absolute nm,params=nil
       n = nil
-      params ||= {}
-      params[:absolute] = true
-      n = resolve nm,params
+      pa = if params then params.clone else {} end
+      pa[:absolute] = true
+      n = resolve nm,pa
       return n
     end
 

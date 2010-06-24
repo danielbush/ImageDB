@@ -374,11 +374,15 @@ module ImageDb
 
     def store path,options=nil
       name = options && options[:name] ? options[:name] : File.basename(path)
-      nm = File.join(@originals,name)
+      nm = absolute(name)
+      old = nil
       if File.exists?(nm)
         raise 'Error #1 '+@@errors[1] if options.nil? || !options[:force]
+        old = true
       end
+      self.delete File.basename(nm) , :skiphook => true
       FileUtils.copy path , nm
+      #self.update File.basename(nm) , :skiphook => true
       @hooks.create(:force => (options.nil? ? nil : options[:force]) ,
                     :original => nm) if @hooks
       nm
@@ -449,10 +453,10 @@ module ImageDb
         return nil
       end
 
-      raise "fetch: Invalid options" if !params.has_key?(:width) &&
-        !params.has_key?(:height) &&
-        !params.has_key?(:absolute) &&
-        !params.has_key?(:not_found)
+      #raise "fetch: Invalid options" if !params.has_key?(:width) &&
+      #  !params.has_key?(:height) &&
+      #  !params.has_key?(:absolute) &&
+      #  !params.has_key?(:not_found)
 
       n = absolute(name,params) # Sized or original
       FileUtils.mkdir_p File.dirname(n)
@@ -496,6 +500,11 @@ module ImageDb
     # specified image.
 
     def update name,params=nil
+
+      # Skip hook calls made by update
+      # (separate to options[:skiphook]):
+      skiphook = (params && params[:skiphook])
+
       options = {
         :update => true,   # Force update even if it exists
         :exists => false,  # Don't autogenerate
@@ -513,14 +522,14 @@ module ImageDb
           self.fetch(name,options.merge(:height => h))}
         @hooks.create(:original => original,
                       :sized => others,
-                      :update => true) if @hooks
+                      :update => true) if @hooks && !skiphook
         return original
 
       # Update single sized image:
       else
         nm = fetch(name,params.merge(options))
         @hooks.create(:sized => nm,
-                      :update => true) if @hooks
+                      :update => true) if @hooks && !skiphook
         return nm
       end
     end
@@ -529,11 +538,15 @@ module ImageDb
     # if params are given, delete a selected sized image 
 
     def delete name,params=nil
+
+      # Skip hook calls made by update
+      skiphook = (params && params[:skiphook])
+
       images = self.image(name)
       return nil if images.nil?
       o = absolute(images[:original])
 
-      if params.nil?
+      if params.nil? || (!params[:width] && !params[:height])
         File.delete(o) if File.exists?(o)
         [:widths,:heights].each do |w|
           images[w].each do |i|
@@ -542,7 +555,7 @@ module ImageDb
           end
         end
         @hooks.delete(:original => images[:original],
-                      :sized => images[:widths]+images[:heights]) if @hooks
+                      :sized => images[:widths]+images[:heights]) if @hooks && !skiphook
         return o
 
       else
@@ -551,11 +564,11 @@ module ImageDb
         if w
           n = absolute(name,:width => w)
           File.delete(n)
-          @hooks.delete(:sized => [n]) if @hooks
+          @hooks.delete(:sized => [n]) if @hooks && !skiphook
         elsif h
           n = absolute(name,:height => h)
           File.delete(n)
-          @hooks.delete(:sized => [n]) if @hooks
+          @hooks.delete(:sized => [n]) if @hooks && !skiphook
         else
           raise 'Error #2 '+@@errors[2]
         end

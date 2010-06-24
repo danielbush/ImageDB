@@ -97,6 +97,19 @@ class TestImageDb < Test::Unit::TestCase
     assert_equal 'image-1a.jpg',File.basename(r)
   end
 
+  # Store an image with force option will update sized images...
+
+  def test_02d
+    db = build
+    n1 = db.fetch('image-1.jpg',:width => 101)
+    n2 = db.fetch('image-1.jpg',:width => 102)
+    assert File.exists?(n1)
+    assert File.exists?(n2)
+    nm = File.join(@@test_data,'image-2.jpg')
+    r = db.store(nm,:name => 'image-1.jpg',:force => true)
+    assert !File.exists?(n1)
+    assert !File.exists?(n2)
+  end
 
   #--------------------------------------------------------------
   # Fetching

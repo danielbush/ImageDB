@@ -128,6 +128,8 @@ class TestImageDb < Test::Unit::TestCase
     db = build
     nm = db.fetch('image-non-existent.jpg')
     assert nm.nil?
+    nm = db.fetch('image-non-existent.jpg',:absolute => true)
+    assert nm.nil?
   end
 
   # Fetching sized image will autogenerate it if it didn't exist

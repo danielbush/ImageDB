@@ -451,12 +451,10 @@ module ImageDb
       if params.nil?
         return resolve(name) if File.exists?(o)
         return nil
+      elsif !params[:width] && !params[:height]
+        return absolute(name) if File.exists?(o)
+        return nil
       end
-
-      #raise "fetch: Invalid options" if !params.has_key?(:width) &&
-      #  !params.has_key?(:height) &&
-      #  !params.has_key?(:absolute) &&
-      #  !params.has_key?(:not_found)
 
       n = absolute(name,params) # Sized or original
       FileUtils.mkdir_p File.dirname(n)

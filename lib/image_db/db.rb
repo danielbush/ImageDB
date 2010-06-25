@@ -439,9 +439,13 @@ module ImageDb
 
       # Original doesn't exist, use nf...
 
-      if !File.exists?(o) && self.use_not_found
-        name = nf
-        o = absolute(name)
+      if !File.exists?(o)
+        if (self.use_not_found || params && params[:not_found])
+          name = nf
+          o = absolute(name)
+        else
+          return nil
+        end
       end
 
       return nil if name.nil?

@@ -130,6 +130,8 @@ class TestImageDb < Test::Unit::TestCase
     assert nm.nil?
     nm = db.fetch('image-non-existent.jpg',:absolute => true)
     assert nm.nil?
+    nm = db.fetch('image-non-existent.jpg',:width => 63)
+    assert nm.nil?
   end
 
   # Fetching sized image will autogenerate it if it didn't exist
@@ -527,7 +529,7 @@ class TestImageDb < Test::Unit::TestCase
   #--------------------------------------------------------------
   # Not found image
 
-  # db.not_found_image works; only root db is used...
+  # db.not_found_image works...
 
   def test_12a
     db = build
@@ -582,6 +584,22 @@ class TestImageDb < Test::Unit::TestCase
     r = db.fetch('foo.jpg')
     assert(/image-1.jpg/===r)
   end
+
+  # We don't need to turn on use_not_found if we override
+
+  def test_12d2
+    db = build
+    r = db.fetch('foo.jpg')
+    assert_nil r
+    r = db.fetch('foo.jpg' , :not_found => 'image-2.jpg')
+    assert(/image-2.jpg/===r)
+    r = db.fetch('foo.jpg' , :width => 61,
+                 :not_found => 'image-2.jpg')
+    assert(/w.61.image-2.jpg/===r)
+    r = db.fetch('foo.jpg' , :width => 61)
+    assert_nil r
+  end
+
 
   # Fetch not found image if :exists is true (instead of autogenerating)
   # (original image exists)

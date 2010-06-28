@@ -1,3 +1,8 @@
+[27-Jun-2010] [DB]
+* Fetch should call all creation/resize hooks since it
+  does all the work
+  * pass in a method name call if you want to track
+    which method called fetch
 [21-Jun-2010] [DB]
 * An interface to make ruby-db language agnostic
   * distributed ruby

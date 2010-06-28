@@ -146,7 +146,7 @@ module ImageDb
 #       => fetches sized image; autogenerates it if necessary
 #       => "/db.root/path/to/w/60/image"
 # 
-#     db.fetch(name,:height => 60,:exists => true)
+#     db.fetch(name,:height => 60,:resize => false)
 #       => Don't autogenerate if image doesn't exist
 # 
 #     db['group1'].fetch(name,:width => 60)
@@ -423,77 +423,107 @@ module ImageDb
     #                    Omitting this will return the original.
     # * absolute: return the file path; do not resolve to rel_root
     # * not_found: specify a not_found image; in general set this using
-    #              DB#not_found_image but override here if you want to
-    # * exists: do not autogenerate image; this is how to test for existence
+    #              DB#not_found_image but can be overridden here
+    # * resize => nil   : default; autogenerate a sized image if required
+    # * resize => false : do not autogenerate image; this is how to
+    #                     test for existence
+    # * resize => true  : force image generation even if it exists; used
+    #                     by 'update'
     # * skiphook: skip running creation hook
-    # * update: force image generation even if it exists; used by 'update'
+    #
+    # If a not-found image is being used, it will be resized regardless
+    # of the resize parameter.
 
     def fetch name,params=nil
 
+      fetch_original = !params || !params[:width] && !params[:height]
+      use_not_found = (self.use_not_found ||
+                       params && !params[:not_found].nil?)
+      nf_image = (params && params.has_key?(:not_found) ?
+                  params[:not_found] : self.not_found_image)
+
       o = absolute(name) # Original
-      n = nil
 
-      # Find not_found image...
-      nf = (params && params.has_key?(:not_found) ?
-                     params[:not_found] : self.not_found_image)
+      # Fetch original image:
 
-      # Original doesn't exist, use nf...
+      if fetch_original
+        if params && params[:absolute]
+          return o if File.exists?(o)
+          return absolute(nf_image) if use_not_found && !nf_image.nil?
+          return nil
+        else
+          return resolve(name) if File.exists?(o)
+          return resolve(nf_image) if use_not_found && !nf_image.nil?
+          return nil
+        end
+      end
+      
+      # Fetch sized image:
 
-      if !File.exists?(o)
-        if (self.use_not_found || params && params[:not_found])
-          name = nf
-          o = absolute(name)
+      s = absolute(name,params)
+
+      if File.exists?(o) # original exists
+
+        if File.exists?(s)
+          create_size(o,s,params) if params[:resize]==true
+          return s if params[:absolute]
+          return resolve(name,params)
+
+        else # sized image doesn't exist
+          if params[:resize]==false
+            if use_not_found
+              return nil if nf_image.nil?
+              n = absolute(nf_image)
+              ns = absolute(nf_image,params)
+              create_size(n,ns,params)
+                  # This may return nil if 'a' doesn't exist.
+                  # Regardless, we return the location.
+              return ns if params[:absolute]
+              return resolve(nf_image,params)
+            else
+              return nil
+            end
+          end
+          # Generate sized image:
+          create_size(o,s,params)
+          return s if params[:absolute]
+          return resolve(name,params)
+        end
+
+
+      else # original doesn't exist
+        if use_not_found
+          return nil if nf_image.nil?
+          n = absolute(nf_image)
+          ns = absolute(nf_image,params)
+          create_size(n,ns,params)
+              # This may return nil if 'a' doesn't exist.
+              # Regardless, we return the location.
+          return ns if params[:absolute]
+          return resolve(nf_image,params)
         else
           return nil
         end
       end
 
-      return nil if name.nil?
 
-      # Fetch original...
 
-      if params.nil?
-        return resolve(name) if File.exists?(o)
-        return nil
-      elsif !params[:width] && !params[:height]
-        return absolute(name) if File.exists?(o)
-        return nil
-      end
-
-      n = absolute(name,params) # Sized or original
-      FileUtils.mkdir_p File.dirname(n)
-
-      # Autogenerate/regenerate/do-nothing on sized image (n)
-      # depending on settings...
-
-      if File.exists?(n)
-        unless params[:update]
-          return absolute(name,params) if params[:absolute]
-          return resolve(name,params)
-        end
-      else
-        if params[:exists]==true
-          # Slightly ugly.  We have an original, but this size
-          # doesn't exist.  We revert back to the not found image.
-          if self.use_not_found
-            return absolute(nf,params) if params[:absolute]
-            return resolve(nf,params)
-          end
-          return nil
-        end
-        autogenerated = true
-      end
-
-      i = Image.new(o)
-      params[:to] = n
-      i.out params
       @hooks.create(:original => o,
                     :sized => n,
                     :autogenerated => autogenerated,
                     :width => params[:width],
                     :height => params[:height]) if @hooks && !params[:skiphook]
-      return absolute(name,params) if params[:absolute]
-      return resolve(name,params)
+    end
+
+    # Helper function to resize image.  Return nil if
+    # source image doesn't exist.
+
+    def create_size src,dest,params
+      return nil if !File.exists?(src)
+      i = Image.new(src)
+      params[:to] = dest
+      FileUtils.mkdir_p File.dirname(dest)
+      i.out params
     end
 
 
@@ -508,8 +538,7 @@ module ImageDb
       skiphook = (params && params[:skiphook])
 
       options = {
-        :update => true,   # Force update even if it exists
-        :exists => false,  # Don't autogenerate
+        :resize => true,   # Force resize even if it exists
         :skiphook => true  # Don't run hooks
       }
 

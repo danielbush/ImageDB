@@ -49,10 +49,13 @@ This package contains two components:
   * operations to do with retrieving and storing files in the
     filesystem are fairly easy and naturally implemented including
     hierarchical storage
+  * used by acts_as_image_file (rails plugin)
   * there is no syncing between the filesystem and ImageDB since
     ImageDB's persistence layer is the filesystem
-    * this advantage is neutralised somewhat if you update a database
-      using the hooks provided by ImageDB
+  * some sort of syncing is required if you use it in conjunction
+    with another db
+    * acts_as_image_file (active record) uses imageDB; it currently
+      defines and after_save callback to look for image name changes
 
 == REQUIREMENTS:
 

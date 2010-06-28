@@ -43,6 +43,7 @@ test/test_data/image-w600-h400-72ppi.gif
 test/test_data/image-w600-h400-72ppi.jpg
 test/test_data/image-w600-h400-72ppi.png
 test/test_data/image.xcf
+test/test_fetch.rb
 test/test_helper.rb
 test/test_image_db.rb
 test/testutils.rb

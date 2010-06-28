@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Daniel Bush"]
-  s.date = %q{2010-06-23}
+  s.date = %q{2010-06-28}
   s.description = %q{This package contains two components:
 
 * ImageDb::DB is a simple ruby-based client or API for
@@ -21,14 +21,14 @@ Gem::Specification.new do |s|
   or the source files (in lib/).}
   s.email = ["dlb.id.au@gmail.com"]
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "PostInstall.txt"]
-  s.files = ["AUTHORS", "History.txt", "LICENSE", "Manifest.txt", "PostInstall.txt", "README.rdoc", "Rakefile", "TODO", "image_db.gemspec", "lib/image_db.rb", "lib/image_db/db.rb", "lib/image_file.rb", "lib/image_file/image.rb", "script/console", "script/destroy", "script/generate", "test/test_data/backup/bogus_image.jpg", "test/test_data/backup/image with spaces in name.jpg", "test/test_data/backup/image-transparent.gif", "test/test_data/backup/image-transparent.png", "test/test_data/backup/image-transparent.xcf", "test/test_data/backup/image-w600-h400-300ppi.gif", "test/test_data/backup/image-w600-h400-300ppi.jpg", "test/test_data/backup/image-w600-h400-300ppi.png", "test/test_data/backup/image-w600-h400-72ppi.gif", "test/test_data/backup/image-w600-h400-72ppi.jpg", "test/test_data/backup/image-w600-h400-72ppi.png", "test/test_data/backup/image.xcf", "test/test_data/bogus_image.jpg", "test/test_data/image with spaces in name.jpg", "test/test_data/image-1.jpg", "test/test_data/image-2.jpg", "test/test_data/image-3.jpg", "test/test_data/image-4.jpg", "test/test_data/image-5.jpg", "test/test_data/image-6.jpg", "test/test_data/image-transparent.gif", "test/test_data/image-transparent.png", "test/test_data/image-transparent.xcf", "test/test_data/image-w600-h400-300ppi.jpg", "test/test_data/image-w600-h400-300ppi.png", "test/test_data/image-w600-h400-72ppi.gif", "test/test_data/image-w600-h400-72ppi.jpg", "test/test_data/image-w600-h400-72ppi.png", "test/test_data/image.xcf", "test/test_helper.rb", "test/test_image_db.rb", "test/testutils.rb"]
+  s.files = ["AUTHORS", "History.txt", "LICENSE", "Manifest.txt", "PostInstall.txt", "README.rdoc", "Rakefile", "TODO", "image_db.gemspec", "lib/image_db.rb", "lib/image_db/db.rb", "lib/image_file.rb", "lib/image_file/image.rb", "script/console", "script/destroy", "script/generate", "test/test_data/backup/bogus_image.jpg", "test/test_data/backup/image with spaces in name.jpg", "test/test_data/backup/image-transparent.gif", "test/test_data/backup/image-transparent.png", "test/test_data/backup/image-transparent.xcf", "test/test_data/backup/image-w600-h400-300ppi.gif", "test/test_data/backup/image-w600-h400-300ppi.jpg", "test/test_data/backup/image-w600-h400-300ppi.png", "test/test_data/backup/image-w600-h400-72ppi.gif", "test/test_data/backup/image-w600-h400-72ppi.jpg", "test/test_data/backup/image-w600-h400-72ppi.png", "test/test_data/backup/image.xcf", "test/test_data/bogus_image.jpg", "test/test_data/image with spaces in name.jpg", "test/test_data/image-1.jpg", "test/test_data/image-2.jpg", "test/test_data/image-3.jpg", "test/test_data/image-4.jpg", "test/test_data/image-5.jpg", "test/test_data/image-6.jpg", "test/test_data/image-transparent.gif", "test/test_data/image-transparent.png", "test/test_data/image-transparent.xcf", "test/test_data/image-w600-h400-300ppi.jpg", "test/test_data/image-w600-h400-300ppi.png", "test/test_data/image-w600-h400-72ppi.gif", "test/test_data/image-w600-h400-72ppi.jpg", "test/test_data/image-w600-h400-72ppi.png", "test/test_data/image.xcf", "test/test_fetch.rb", "test/test_helper.rb", "test/test_image_db.rb", "test/testutils.rb"]
   s.homepage = %q{http://github.com/danielbush}
   s.rdoc_options = ["--main", "README.rdoc"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{image_db}
   s.rubygems_version = %q{1.3.4}
   s.summary = %q{This package contains two components:  * ImageDb::DB is a simple ruby-based client or API for accessing and using an image database}
-  s.test_files = ["test/test_image_db.rb", "test/test_helper.rb"]
+  s.test_files = ["test/test_image_db.rb", "test/test_helper.rb", "test/test_fetch.rb"]
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION

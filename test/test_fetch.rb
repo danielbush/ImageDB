@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
 $M = false
-require 'rubygems'
-require 'ruby-debug'
+#require 'rubygems'
+#require 'ruby-debug'
 
 class TestFetch < Test::Unit::TestCase
 

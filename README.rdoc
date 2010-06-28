@@ -74,6 +74,9 @@ This package contains two components:
   sudo gem install pkg/newgem-<version>
 * To test (requires newgem)
   rake test
+* Build documentation:
+  rake redocs
+  * (requires newgem)
 
 == LICENSE:
 

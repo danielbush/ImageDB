@@ -234,7 +234,6 @@ class TestImageDb < Test::Unit::TestCase
   # Storing a new original image...
 
   def test_08a
-return
     db = ITestUtils.newdb
     db.hooks = hooks()
 
@@ -251,7 +250,6 @@ return
   # Should get called if fetch autogenerates an image...
 
   def test_08b
-return
     db = ITestUtils.newdb
     db.hooks = hooks()
 
@@ -267,7 +265,6 @@ return
   # Should be called if we update existing image
 
   def test_08c
-return
     db = ITestUtils.newdb
     db.hooks = hooks()
 
@@ -283,7 +280,6 @@ return
   # Should be called if we force a new original over an existing
 
   def test_08d
-return
     db = ITestUtils.newdb
     db.hooks = hooks()
 
@@ -299,7 +295,6 @@ return
   # Should be called if we update multiple items
 
   def test_08e
-return
     db = ITestUtils.newdb
     nm = File.join(test_data,'image-1.jpg')
     nm = db.store(nm)

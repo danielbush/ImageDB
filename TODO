@@ -3,6 +3,10 @@
   does all the work
   * pass in a method name call if you want to track
     which method called fetch
+* At least, clean up the hook interface; update may
+  or may not pass an array of sized images etc - this is
+  just a bit messy.
+
 [21-Jun-2010] [DB]
 * An interface to make ruby-db language agnostic
   * distributed ruby

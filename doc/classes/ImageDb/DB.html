@@ -209,52 +209,45 @@ is just an experiment - a simple wrapper around a file system
 </ul>
 </li>
 </ul>
-<h3><a href="../ImageDb.html">ImageDb</a> FORMAT</h3>
-<ul>
-<li>the format of the filesystem under the root directory is straightforward
-and easy to navigate manually
-
-</li>
-<li>the <a href="DB.html#M000018">image</a> you <a
-href="DB.html#M000011">store</a> is copied to an originals section so you
-can use it to resize
-
-<pre>
-  root := /path/to/root  # Location of db in filesystem
-  DB := [root]/originals/[name]  # Original image files
-              /groups/[group]    # Groups for sub-db's
-              /w/[width]/[name]  # Width-resized images
-              /h/[height]/[name] # Height-resized images
-  group := [group-name]/[DB]     # Recursive DB
-</pre>
-</li>
-</ul>
+<h3>ImageDB FORMAT</h3>
 <p>
-In other words:
+ImageDB is a simple wrapper around a part of a file system that is
+structured to <a href="DB.html#M000011">store</a> an <a
+href="DB.html#M000018">image</a> at more than one size.
+</p>
+<p>
+The format of the file system used by <a href="DB.html#M000018">image</a>
+db is intended to be simple and modified by hand if necessary.
 </p>
 <ul>
-<li>your <a href="DB.html#M000018">image</a> db is at /path/to/root
+<li>The root of this system is usually set to a public (http accessible) area
+
+<ul>
+<li>eg /your-rails-root/public/images/path/to/db-root
 
 </li>
-<li>original <a href="DB.html#M000017">images</a> are stored in
-originals/[name]
+</ul>
+</li>
+<li>Originals are stored in db-root/originals/
 
 </li>
-<li><a href="DB.html#M000017">images</a> resized according to width are stored
-in w/[width]/[name]
+<li>width-resized versions are stored in db-root/w/&lt;width&gt;/
 
 </li>
-<li><a href="DB.html#M000017">images</a> resized according to height are stored
-in h/[height]/[name]
+<li>height-resized versions are stored in db-root/h/&lt;width&gt;/
 
 </li>
-<li><a href="DB.html#M000020">groups</a> are stored in <a
-href="DB.html#M000020">groups</a>/
+<li>Sub-roots are allowed
+
+<ul>
+<li>db-root/groups/group-1 is a <a href="DB.html#M000008">new</a> root which
+you could access using Image.db[&#8216;group-1&#8217;] eg
+Image.db[&#8216;group-1&#8217;].<a
+href="DB.html#M000013">fetch</a>(&#8216;name.jpg&#8217;,:width =&gt; 80)
+etc
 
 </li>
-<li>an group is defined like the above where root is now <a
-href="DB.html#M000020">groups</a>/[group-name]
-
+</ul>
 </li>
 </ul>
 <h2>USAGE:</h2>
@@ -470,7 +463,12 @@ size
 </ul>
 <h3>HOOKS</h3>
 <ul>
-<li>Hooks are intended to allows you to be notified when a change is made to an
+<li>Consider using imageDB without hooks; for instance you might track an <a
+href="DB.html#M000018">image</a> name in an RDBMS and have an interface for
+this which calls ImageDB when changes occur.
+
+</li>
+<li>Hooks are intended to allow you to be notified when a change is made to an
 <a href="DB.html#M000018">image</a> in the db
 
 <ul>
@@ -681,7 +679,7 @@ Example:
             onclick="toggleCode('M000008-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000008-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 298</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 297</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span> <span class="ruby-identifier">root</span>,<span class="ruby-identifier">rel_root</span>=<span class="ruby-keyword kw">nil</span>,<span class="ruby-identifier">parent_db</span>=<span class="ruby-keyword kw">nil</span>
       <span class="ruby-ivar">@root</span> = <span class="ruby-identifier">root</span>
       <span class="ruby-ivar">@rel_root</span> = <span class="ruby-identifier">rel_root</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-value">? </span><span class="ruby-identifier">root</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">rel_root</span>
@@ -727,7 +725,7 @@ group.
             onclick="toggleCode('M000021-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000021-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 686</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 685</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-operator">[]</span> <span class="ruby-identifier">name</span>
       <span class="ruby-ivar">@groups</span> <span class="ruby-operator">||=</span> {}
       <span class="ruby-identifier">root</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@root</span>,<span class="ruby-value str">'groups'</span>,<span class="ruby-identifier">name</span>)
@@ -769,7 +767,7 @@ always returned.
             onclick="toggleCode('M000010-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000010-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 354</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 353</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">absolute</span> <span class="ruby-identifier">nm</span>,<span class="ruby-identifier">params</span>=<span class="ruby-keyword kw">nil</span>
       <span class="ruby-identifier">n</span> = <span class="ruby-keyword kw">nil</span>
       <span class="ruby-identifier">pa</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">params</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">params</span>.<span class="ruby-identifier">clone</span> <span class="ruby-keyword kw">else</span> {} <span class="ruby-keyword kw">end</span>
@@ -800,7 +798,7 @@ if source <a href="DB.html#M000018">image</a> doesn&#8216;t exist.
             onclick="toggleCode('M000014-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000014-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 516</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 515</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create_size</span> <span class="ruby-identifier">src</span>,<span class="ruby-identifier">dest</span>,<span class="ruby-identifier">params</span>
       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-operator">!</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-identifier">src</span>)
       <span class="ruby-identifier">i</span> = <span class="ruby-constant">Image</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">src</span>)
@@ -838,7 +836,7 @@ href="DB.html#M000018">image</a>
             onclick="toggleCode('M000016-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000016-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 572</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 571</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">delete</span> <span class="ruby-identifier">name</span>,<span class="ruby-identifier">params</span>=<span class="ruby-keyword kw">nil</span>
 
       <span class="ruby-comment cmt"># Skip hook calls made by update</span>
@@ -952,7 +950,7 @@ be resized regardless of the resize parameter.
             onclick="toggleCode('M000013-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000013-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 437</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 436</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">fetch</span> <span class="ruby-identifier">name</span>,<span class="ruby-identifier">params</span>=<span class="ruby-keyword kw">nil</span>
 
       <span class="ruby-identifier">fetch_original</span> = <span class="ruby-operator">!</span><span class="ruby-identifier">params</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">params</span>[<span class="ruby-identifier">:width</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">params</span>[<span class="ruby-identifier">:height</span>]
@@ -1054,7 +1052,7 @@ href="DB.html#M000013">fetch</a> to <a href="DB.html#M000013">fetch</a> it.
             onclick="toggleCode('M000019-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000019-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 665</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 664</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">glob</span> <span class="ruby-identifier">pattern</span>
       <span class="ruby-constant">Dir</span>[<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@originals</span>,<span class="ruby-identifier">pattern</span>)].<span class="ruby-identifier">collect</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
         <span class="ruby-constant">File</span>.<span class="ruby-identifier">basename</span>(<span class="ruby-identifier">f</span>)
@@ -1082,7 +1080,7 @@ List <a href="DB.html#M000020">groups</a> in <a href="DB.html">DB</a>
             onclick="toggleCode('M000020-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000020-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 676</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 675</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">groups</span>
       <span class="ruby-identifier">g</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@root</span>,<span class="ruby-value str">'groups'</span>)
       <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir_p</span> <span class="ruby-identifier">g</span>
@@ -1123,7 +1121,7 @@ Returns { :original =&gt; name ,
             onclick="toggleCode('M000018-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000018-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 639</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 638</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">image</span> <span class="ruby-identifier">name</span>
       <span class="ruby-identifier">n</span> = <span class="ruby-identifier">absolute</span>(<span class="ruby-identifier">name</span>)
       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-identifier">n</span>)
@@ -1173,7 +1171,7 @@ originals. Also see <a href="DB.html#M000019">glob</a>.
             onclick="toggleCode('M000017-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000017-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 622</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 621</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">images</span>
       <span class="ruby-identifier">r</span> = <span class="ruby-keyword kw">nil</span>
       <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span>(<span class="ruby-ivar">@originals</span>) <span class="ruby-keyword kw">do</span>
@@ -1208,7 +1206,7 @@ href="DB.html#M000013">fetch</a>.
             onclick="toggleCode('M000007-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000007-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 292</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 291</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">not_found_image</span>
       <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@not_found_image</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@not_found_image</span>
       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">parent_db</span>.<span class="ruby-identifier">not_found_image</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">parent_db</span>
@@ -1241,7 +1239,7 @@ href="DB.html#M000018">image</a>.
             onclick="toggleCode('M000012-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000012-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 396</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 395</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">rename</span> <span class="ruby-identifier">old</span>,<span class="ruby-identifier">new</span>,<span class="ruby-identifier">params</span>=<span class="ruby-keyword kw">nil</span>
       <span class="ruby-identifier">a</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">image</span>(<span class="ruby-identifier">old</span>)
       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">nil?</span>
@@ -1297,7 +1295,7 @@ were in the db (whether it is or not)
             onclick="toggleCode('M000009-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000009-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 333</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 332</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">resolve</span> <span class="ruby-identifier">nm</span>,<span class="ruby-identifier">params</span>=<span class="ruby-keyword kw">nil</span>
       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">nm</span>.<span class="ruby-identifier">nil?</span>
       <span class="ruby-identifier">root</span> = <span class="ruby-ivar">@root</span>
@@ -1345,7 +1343,7 @@ options[:name]
             onclick="toggleCode('M000011-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000011-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 375</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 374</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">store</span> <span class="ruby-identifier">path</span>,<span class="ruby-identifier">options</span>=<span class="ruby-keyword kw">nil</span>
       <span class="ruby-identifier">name</span> = <span class="ruby-identifier">options</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:name</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:name</span>] <span class="ruby-operator">:</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">basename</span>(<span class="ruby-identifier">path</span>)
       <span class="ruby-identifier">nm</span> = <span class="ruby-identifier">absolute</span>(<span class="ruby-identifier">name</span>)
@@ -1386,7 +1384,7 @@ href="DB.html#M000018">image</a>.
             onclick="toggleCode('M000015-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000015-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 535</span>
+<span class="ruby-comment cmt"># File lib/image_db/db.rb, line 534</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">update</span> <span class="ruby-identifier">name</span>,<span class="ruby-identifier">params</span>=<span class="ruby-keyword kw">nil</span>
 
       <span class="ruby-comment cmt"># Skip hook calls made by update</span>

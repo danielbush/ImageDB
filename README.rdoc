@@ -17,6 +17,10 @@ This package contains two components:
   This can be run without ImageDb.
 * For documentation on both of these build or check rdoc documentation
   or the source files (in lib/).
+* You might be interested in this if you need to be able to show
+  the same image at various different sizes
+* An acts_as_image_file plugin for rails has also been written
+  to use this software; see http://github.com/danielbush
 
 === Features
 

@@ -77,28 +77,24 @@ module ImageDb
 #     a file system
 # 
 # 
-# === ImageDb FORMAT
+# === ImageDB FORMAT
+#   
+# ImageDB is a simple wrapper around a part of a file system
+# that is structured to store an image at more than one size.
 # 
-# * the format of the filesystem under the root directory is
-#   straightforward and easy to navigate manually
-# * the image you store is copied to an originals section so
-#   you can use it to resize
+# The format of the file system used by image db is intended to be
+# simple and modified by hand if necessary.
 # 
-#     root := /path/to/root  # Location of db in filesystem
-#     DB := [root]/originals/[name]  # Original image files
-#                 /groups/[group]    # Groups for sub-db's
-#                 /w/[width]/[name]  # Width-resized images
-#                 /h/[height]/[name] # Height-resized images
-#     group := [group-name]/[DB]     # Recursive DB
-# 
-# In other words:
-# * your image db is at /path/to/root
-# * original images are stored in originals/[name]
-# * images resized according to width are stored in w/[width]/[name]
-# * images resized according to height are stored in h/[height]/[name]
-# * groups are stored in groups/
-# * an group is defined like the above where
-#   root is now groups/[group-name]
+# * The root of this system is usually set to a public (http accessible)
+#   area
+#   * eg /your-rails-root/public/images/path/to/db-root
+# * Originals are stored in db-root/originals/
+# * width-resized versions are stored in db-root/w/<width>/
+# * height-resized versions are stored in db-root/h/<width>/
+# * Sub-roots are allowed
+#   * db-root/groups/group-1 is a new root which you could
+#     access using Image.db['group-1'] 
+#     eg Image.db['group-1'].fetch('name.jpg',:width => 80) etc
 # 
 # == USAGE:
 # 
@@ -238,7 +234,10 @@ module ImageDb
 # 
 # === HOOKS
 # 
-# * Hooks are intended to allows you to be notified when a
+# * Consider using imageDB without hooks; for instance you
+#   might track an image name in an RDBMS and have an interface for
+#   this which calls ImageDB when changes occur.
+# * Hooks are intended to allow you to be notified when a
 #   change is made to an image in the db
 #   * original image is created
 #   * original image is replaced by a new one

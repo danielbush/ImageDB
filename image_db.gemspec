@@ -18,7 +18,11 @@ Gem::Specification.new do |s|
 * ImageFile::Image defines an Image class that represents an image file.
   This can be run without ImageDb.
 * For documentation on both of these build or check rdoc documentation
-  or the source files (in lib/).}
+  or the source files (in lib/).
+* You might be interested in this if you need to be able to show
+  the same image at various different sizes
+* An acts_as_image_file plugin for rails has also been written
+  to use this software; see http://github.com/danielbush}
   s.email = ["dlb.id.au@gmail.com"]
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "PostInstall.txt"]
   s.files = ["AUTHORS", "History.txt", "LICENSE", "Manifest.txt", "PostInstall.txt", "README.rdoc", "Rakefile", "TODO", "image_db.gemspec", "lib/image_db.rb", "lib/image_db/db.rb", "lib/image_file.rb", "lib/image_file/image.rb", "script/console", "script/destroy", "script/generate", "test/test_data/backup/bogus_image.jpg", "test/test_data/backup/image with spaces in name.jpg", "test/test_data/backup/image-transparent.gif", "test/test_data/backup/image-transparent.png", "test/test_data/backup/image-transparent.xcf", "test/test_data/backup/image-w600-h400-300ppi.gif", "test/test_data/backup/image-w600-h400-300ppi.jpg", "test/test_data/backup/image-w600-h400-300ppi.png", "test/test_data/backup/image-w600-h400-72ppi.gif", "test/test_data/backup/image-w600-h400-72ppi.jpg", "test/test_data/backup/image-w600-h400-72ppi.png", "test/test_data/backup/image.xcf", "test/test_data/bogus_image.jpg", "test/test_data/image with spaces in name.jpg", "test/test_data/image-1.jpg", "test/test_data/image-2.jpg", "test/test_data/image-3.jpg", "test/test_data/image-4.jpg", "test/test_data/image-5.jpg", "test/test_data/image-6.jpg", "test/test_data/image-transparent.gif", "test/test_data/image-transparent.png", "test/test_data/image-transparent.xcf", "test/test_data/image-w600-h400-300ppi.jpg", "test/test_data/image-w600-h400-300ppi.png", "test/test_data/image-w600-h400-72ppi.gif", "test/test_data/image-w600-h400-72ppi.jpg", "test/test_data/image-w600-h400-72ppi.png", "test/test_data/image.xcf", "test/test_fetch.rb", "test/test_helper.rb", "test/test_image_db.rb", "test/testutils.rb"]

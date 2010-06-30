@@ -5,7 +5,7 @@ $M = false
 
 class TestFetch < Test::Unit::TestCase
 
-  Image = ImageFile::Image
+  Image = DLBImageUtils::ImageFile::Image
   include ITestUtils  # test_helper
 
   def setup

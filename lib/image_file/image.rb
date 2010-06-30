@@ -4,6 +4,7 @@
 # See the README.rdoc file for details.
 
 
+module DLBImageUtils
 module ImageFile
 
   class Image
@@ -99,5 +100,6 @@ module ImageFile
 
 
 
+end
 end
 

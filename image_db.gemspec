@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{image_db}
-  s.version = "0.0.2"
+  s.version = "0.0.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Daniel Bush"]
-  s.date = %q{2010-06-28}
+  s.date = %q{2010-06-30}
   s.description = %q{This package contains two components:
 
 * ImageDb::DB is a simple ruby-based client or API for

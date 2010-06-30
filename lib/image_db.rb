@@ -6,8 +6,8 @@
 $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
-module ImageDb
-  VERSION = '0.0.4'
+module DLBImageUtils
+  VERSION = '0.0.5'
 end
 
 require 'fileutils'

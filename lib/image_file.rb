@@ -47,6 +47,8 @@ $:.unshift(File.dirname(__FILE__)) unless
 # 
 
 
+module DLBImageUtils
+
 module ImageFile
 
   TESTDIR = File.join(File.dirname(__FILE__) , '..' , 'test' , 'test_data')
@@ -90,6 +92,7 @@ module ImageFile
     [convert,identify]
   end
 
+end
 end
 
 require 'image_file/image'

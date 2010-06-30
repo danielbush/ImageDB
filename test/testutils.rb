@@ -33,7 +33,7 @@ module ITestUtils
   # Instantiate a new db
 
   def self.newdb
-    ImageDb::DB.new(self.tmpdir)
+    DLBImageUtils::ImageDb::DB.new(self.tmpdir)
   end
 
 
@@ -53,9 +53,9 @@ module ITestUtils
   def build rel_root=nil
     build_images
     if rel_root.nil?
-      db = ImageDb::DB.new(ITestUtils.tmpdir)
+      db = DLBImageUtils::ImageDb::DB.new(ITestUtils.tmpdir)
     else
-      db = ImageDb::DB.new(ITestUtils.tmpdir,rel_root)
+      db = DLBImageUtils::ImageDb::DB.new(ITestUtils.tmpdir,rel_root)
     end
     1.upto(6) do |i|
       db.store File.join(test_data,'image-'+i.to_s+'.jpg')

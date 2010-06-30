@@ -3,9 +3,10 @@
 # This program is distributed under the terms of the MIT License.
 # See the README.rdoc file for details.
 
+module DLBImageUtils
 module ImageDb
 
-  Image = ImageFile::Image
+  Image = DLBImageUtils::ImageFile::Image
   FileSeparator = File.join('','')
 
 # = Image DB
@@ -705,4 +706,5 @@ module ImageDb
 
   end
 
+end
 end

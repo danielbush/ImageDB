@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/test_helper.rb'
 
 class TestImageDb < Test::Unit::TestCase
 
-  Image = ImageFile::Image
+  Image = DLBImageUtils::ImageFile::Image
 
   include ITestUtils  # test_helper
 

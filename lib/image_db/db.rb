@@ -442,6 +442,11 @@ module ImageDb
       nf_image = (params && params.has_key?(:not_found) ?
                   params[:not_found] : self.not_found_image)
 
+      if name.nil?
+        return nil unless use_not_found
+        name = nf_image
+      end
+
       o = absolute(name) # Original
 
       # Fetch original image:

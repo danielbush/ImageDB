@@ -107,6 +107,28 @@ class TestImageDb < Test::Unit::TestCase
   end
 
 
+  # Fetching nil returns nil unless not-found is set...
+  #
+  # Fetching nil might be one way to deliberately retrieve
+  # a not-found image.  It also turns out to be useful
+  # in acts as image file rails plugin when dealing with
+  # a new image record that doesn't have a name.
+
+  def test_03g
+    rel_root = '/crazy/http/alias'
+    db = build(rel_root)
+
+    nm = db.fetch(nil)
+    assert_nil nm
+
+    nm = db.fetch(nil,:not_found => 'foo.jpg')
+    assert /foo.jpg/===nm
+
+    db.use_not_found = true
+    db.not_found_image = 'bar.jpg'
+    nm = db.fetch(nil)
+    assert /bar.jpg/===nm
+  end
 
   #--------------------------------------------------------------
   # Resolving images

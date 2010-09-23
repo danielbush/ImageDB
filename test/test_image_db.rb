@@ -122,12 +122,12 @@ class TestImageDb < Test::Unit::TestCase
     assert_nil nm
 
     nm = db.fetch(nil,:not_found => 'foo.jpg')
-    assert /foo.jpg/===nm
+    assert(/foo.jpg/===nm)
 
     db.use_not_found = true
     db.not_found_image = 'bar.jpg'
     nm = db.fetch(nil)
-    assert /bar.jpg/===nm
+    assert(/bar.jpg/===nm)
   end
 
   #--------------------------------------------------------------
